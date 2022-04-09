@@ -1,0 +1,58 @@
+name: CI for KHLD
+on:
+  push:
+    paths:
+      - ".github/**"
+      - "khldaemon/**"
+      - "*.py"
+
+jobs:
+  assemble:
+    runs-on: ubuntu-latest
+    name: Assemble a dev source compressed file
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Create Dev Build
+        run: |
+          mkdir KHLDaemon
+          mv * KHLDaemon || true
+          cd KHLDaemon
+          rm -rf .git tests
+          rm -f .gitignore setup.py MANIFEST.in *.md
+          cd ..
+          zip -r KHLDaemon-dev.zip ./KHLDaemon
+      - uses: actions/upload-artifact@v2
+        with:
+          name: KHLDaemon dev source for ${{ github.sha }}
+          path: KHLDaemon-dev.zip
+
+  build:
+    runs-on: ubuntu-latest
+    name: Build with python ${{ matrix.python-version }}
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.6
+
+    - uses: actions/cache@v2
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install setuptools wheel
+    - name: Create distribution
+      run: |
+        python setup.py sdist bdist_wheel
+
+    - uses: actions/upload-artifact@v2
+      with:
+        name: KHLDaemon package distribution for ${{ github.sha }}
+        path: dist/
