@@ -23,6 +23,8 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
+    - name: Install setuptols
+      run: |
         pip install setuptools wheel
     - name: Create distribution
       run: |
