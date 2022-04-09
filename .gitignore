@@ -127,3 +127,10 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+.idea/
+
+# KHLDaemon init files
+config.yml
+config/
+plugin/
