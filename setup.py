@@ -18,7 +18,7 @@ NAME = core_constant.PACKAGE_NAME
 VERSION = core_constant.VERSION_PYPI
 DESCRIPTION = 'Plugin system based on khl.py'
 URL = 'https://github.com/DancingSnow0517/KHLDaemon'
-AUTHOR = 'HuajiMUR233'
+AUTHOR = 'DancingSnow'
 
 CLASSIFIERS = [
     # https://pypi.org/classifiers/
