@@ -2,22 +2,19 @@ import os
 from typing import List
 
 from khl import Message, MessageTypes
-from ruamel import yaml
 
 from .plugin_interface import PluginInterface
 from .type.plugin import Plugin
-from ..config import Config
 
 
 class PluginManager:
 
     plugins: List[Plugin]
 
-    def __init__(self) -> None:
-        with open('config.yml', 'r', encoding='utf-8') as f:
-            config = Config(**yaml.round_trip_load(f))
+    def __init__(self, config, logger) -> None:
         self.plugins = []
         self.config = config
+        self.logger = logger
         self.interface = PluginInterface(self)
         self.interface.bot.client.register(MessageTypes.TEXT, self.on_message)
 

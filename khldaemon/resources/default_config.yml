@@ -7,6 +7,10 @@
 # put your khl bot token here
 token: ''
 
-# The list of directory path where MCDR will search for plugin to load
+# The list of directory path where KHLDaemon will search for plugin to load
 plugin_directories:
 - plugin
+
+# set log level
+log_level: DEBUG
+

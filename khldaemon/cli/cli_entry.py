@@ -1,9 +1,14 @@
+import asyncio
 import os.path
 import pkgutil
 import sys
 from argparse import ArgumentParser
 
+from ruamel import yaml
+
+from ..config import Config
 from ..plugin.plugin_manager import PluginManager
+from ..utils.logger import ColoredLogger
 
 
 def entry_point():
@@ -40,13 +45,22 @@ def run_bot():
     if not environment_check():
         raise Exception('Use "python -m khldaemon init" to initialize KHLDaemon first')
 
-    plugin_manager = PluginManager()
+    with open('config.yml', 'r', encoding='utf-8') as f:
+        config = Config(**yaml.round_trip_load(f))
+
+    logger = ColoredLogger(level=config.log_level)
+    patch(logger)
+
+    plugin_manager = PluginManager(config, logger)
     plugin_manager.load_plugins()
 
+    if not plugin_manager.interface.bot.loop:
+        plugin_manager.interface.bot.loop = asyncio.get_event_loop()
     try:
-        plugin_manager.interface.bot.run()
+        plugin_manager.interface.bot.loop.run_until_complete(plugin_manager.interface.bot.start())
     except KeyboardInterrupt:
         plugin_manager.unload_plugins()
+        logger.info('KHLDamon stopped')
 
 
 def initialize_environment():
@@ -62,3 +76,16 @@ def initialize_environment():
 
 def init_bot():
     initialize_environment()
+
+
+def patch(logger):
+    import khl.command
+    import khl.bot
+    khl.receiver.log = logger
+    khl.client.log = logger
+    khl.requester.log = logger
+    khl.command.command.log = logger
+    khl.command.parser.log = logger
+    khl.command.manager.log = logger
+    khl.command.lexer.log = logger
+    khl.bot.log = logger
