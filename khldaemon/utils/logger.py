@@ -62,7 +62,7 @@ class ColoredLogger(logging.Logger):
         }
     }
     FILE_FMT = NoColorFormatter(
-        '[%(module)s] [%(asctime)s] [%(threadName)s/%(levelname)s]: %(message)s',
+        '[%(name)s] [%(asctime)s] [%(threadName)s/%(levelname)s]: %(message)s',
         datefmt='%Y-%m-%d %H:%M:%S'
     )
 
@@ -80,7 +80,7 @@ class ColoredLogger(logging.Logger):
     def get_console_formatter(cls, plugin_id=None):
         extra = '' if plugin_id is None else ' [{}]'.format(plugin_id)
         return ColoredFormatter(
-            f'[%(module)s] [%(asctime)s] [%(threadName)s/%(log_color)s%(levelname)s%(reset)s]{extra}: %(message_log_color)s%(message)s%(reset)s',
+            f'[%(name)s] [%(asctime)s] [%(threadName)s/%(log_color)s%(levelname)s%(reset)s]{extra}: %(message_log_color)s%(message)s%(reset)s',
             log_colors=cls.LOG_COLORS,
             secondary_log_colors=cls.SECONDARY_LOG_COLORS,
             datefmt='%H:%M:%S'

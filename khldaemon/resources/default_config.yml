@@ -12,5 +12,5 @@ plugin_directories:
 - plugin
 
 # set log level
-log_level: DEBUG
+log_level: INFO
 

@@ -4,6 +4,7 @@ import pkgutil
 import sys
 from argparse import ArgumentParser
 
+from khldaemon.constants import core_constant
 from ruamel import yaml
 
 from ..config import Config
@@ -42,6 +43,8 @@ def environment_check():
 
 
 def run_bot():
+    print('{} {} is starting up'.format(core_constant.NAME, core_constant.VERSION))
+    print('{} is open source, you can find it here: {}'.format(core_constant.NAME, core_constant.GITHUB_URL))
     if not environment_check():
         raise Exception('Use "python -m khldaemon init" to initialize KHLDaemon first')
 
@@ -54,10 +57,10 @@ def run_bot():
     plugin_manager = PluginManager(config, logger)
     plugin_manager.load_plugins()
 
-    if not plugin_manager.interface.bot.loop:
-        plugin_manager.interface.bot.loop = asyncio.get_event_loop()
+    if not plugin_manager.bot.loop:
+        plugin_manager.bot.loop = asyncio.get_event_loop()
     try:
-        plugin_manager.interface.bot.loop.run_until_complete(plugin_manager.interface.bot.start())
+        plugin_manager.bot.loop.run_until_complete(plugin_manager.bot.start())
     except KeyboardInterrupt:
         plugin_manager.unload_plugins()
         logger.info('KHLDamon stopped')
