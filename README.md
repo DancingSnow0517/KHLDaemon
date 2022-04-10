@@ -22,6 +22,9 @@
 from khl import Message
 
 from khldaemon.api.all import *
+# or
+# from khldaemon.api.interface import *
+# from khldaemon.api.utils import *
 
 # plugin meta
 PLUGIN_METADATA = {
@@ -34,14 +37,31 @@ PLUGIN_METADATA = {
 }
 
 
+class Config(Serializable):
+    config1: str = 'c1'
+    config2: str = 'c1'
+    config3: bool = False
+
+
+config: Config
+
+
 # run when bot start
 def on_load(interface: PluginInterface):
+    global config
     interface.logger.info('plugin loaded')
     bot = interface.bot
 
     @bot.command(name='test')
     async def test(msg: Message):
         await msg.reply('test')
+    
+    # config interface
+    config = interface.load_config_simple(file_name='test_config.json', target_class=Config, in_data_folder=True)
+
+    config.config1 = 't'
+
+    interface.save_config_simple(config=config, file_name='test_config.json', in_data_folder=True)
 
 
 # run when bot stop
