@@ -21,7 +21,7 @@
 ```python
 from khl import Message
 
-from khldaemon.plugin.interface import PluginInterface
+from khldaemon.api.all import *
 
 # plugin meta
 PLUGIN_METADATA = {
@@ -30,7 +30,7 @@ PLUGIN_METADATA = {
     'name': 'Test Plugin',
     'description': 'A test plugin',
     'author': 'DancingSnow',
-    'link': 'https://github.com/DancingSnow0517/khl.py/tree/plugin'
+    'link': 'https://github.com/DancingSnow0517/'
 }
 
 
@@ -50,7 +50,7 @@ def on_unload(interface: PluginInterface):
 
 
 # run when a message is received
-async def on_message(msg: Message):
-    print(msg.content)
+async def on_message(interface: MessageInterface):
+    interface.logger(interface.message.content)
 
 ```
