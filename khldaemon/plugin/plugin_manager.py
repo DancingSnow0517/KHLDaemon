@@ -2,7 +2,7 @@ import os
 from typing import Dict
 
 from colorama import Fore, Style
-from khl import Message, MessageTypes, Bot
+from khl import Message, MessageTypes
 
 from .interface import PluginInterface, MessageInterface
 from .type.plugin import Plugin
@@ -12,12 +12,12 @@ from ..utils.logger import ColoredLogger
 class PluginManager:
     plugins: Dict
 
-    def __init__(self, config) -> None:
+    def __init__(self, config, bot) -> None:
         self.plugins = {}
         self.help_messages = {}
         self.config = config
         self.logger = ColoredLogger(level=self.config.log_level)
-        self.bot = Bot(self.config.token)
+        self.bot = bot
         self.bot.client.register(MessageTypes.TEXT, self.on_message)
 
     def search_all_plugin(self):

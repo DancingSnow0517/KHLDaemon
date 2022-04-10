@@ -1,4 +1,3 @@
-import asyncio
 import os.path
 import pkgutil
 import sys
@@ -7,10 +6,7 @@ from argparse import ArgumentParser
 import colorama
 
 from khldaemon.constants import core_constant
-from ruamel import yaml
-
-from ..config import Config
-from ..plugin.plugin_manager import PluginManager
+from ..khld_server import KHLDaemonServer
 from ..utils.logger import ColoredLogger
 
 
@@ -47,26 +43,17 @@ def environment_check():
 def run_bot():
     print('{} {} is starting up'.format(core_constant.NAME, core_constant.VERSION))
     print('{} is open source, you can find it here: {}'.format(core_constant.NAME, core_constant.GITHUB_URL))
-    colorama.init(autoreset=True)
     if not environment_check():
-        raise Exception('Use "python -m khldaemon init" to initialize KHLDaemon first')
+        print('Use "python -m khldaemon init" to initialize KHLDaemon first')
+        return
 
-    with open('config.yml', 'r', encoding='utf-8') as f:
-        config = Config(**yaml.round_trip_load(f))
+    colorama.init(autoreset=True)
+    khldaemon_server = KHLDaemonServer()
 
-    logger = ColoredLogger(name='khl.py', level=config.log_level)
+    logger = ColoredLogger(name='khl.py', level=khldaemon_server.config.log_level)
     patch(logger)
 
-    plugin_manager = PluginManager(config)
-    plugin_manager.load_plugins()
-
-    if not plugin_manager.bot.loop:
-        plugin_manager.bot.loop = asyncio.get_event_loop()
-    try:
-        plugin_manager.bot.loop.run_until_complete(plugin_manager.bot.start())
-    except KeyboardInterrupt:
-        plugin_manager.unload_plugins()
-        plugin_manager.logger.info('KHLDamon stopped')
+    khldaemon_server.start()
 
 
 def initialize_environment():
