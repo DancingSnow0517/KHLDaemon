@@ -1,4 +1,4 @@
-from ...plugin.plugin_interface import PluginInterface, MessageInterface
+from ...plugin.interface import PluginInterface, MessageInterface
 
 __all__ = [
     'PluginInterface',

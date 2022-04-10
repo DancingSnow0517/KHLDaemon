@@ -1,21 +1,22 @@
 import os
 from typing import List
+from colorama import Fore, Style
 
 from khl import Message, MessageTypes, Bot
 
-from .plugin_interface import PluginInterface
+from .interface import PluginInterface, MessageInterface
 from .type.plugin import Plugin
 from ..utils.logger import ColoredLogger
 
 
 class PluginManager:
-
     plugins: List[Plugin]
 
-    def __init__(self, config, logger: ColoredLogger) -> None:
+    def __init__(self, config) -> None:
         self.plugins = []
+        self.help_messages = {}
         self.config = config
-        self.logger = logger
+        self.logger = ColoredLogger(level=self.config.log_level)
         self.bot = Bot(self.config.token)
         self.bot.client.register(MessageTypes.TEXT, self.on_message)
 
@@ -31,7 +32,7 @@ class PluginManager:
     def load_plugins(self):
         self.search_all_plugin()
         for plugin in self.plugins:
-            self.logger.info(f'插件 {plugin.meta.name}@{plugin.meta.id} V{plugin.meta.version} 已加载')
+            self.logger.info(f'插件 {plugin.meta.name}{Fore.GREEN}@{Style.RESET_ALL}{plugin.meta.id} {Fore.GREEN}V{plugin.meta.version}{Style.RESET_ALL} 已加载')
             plugin.on_load(PluginInterface(self, plugin.meta.id))
 
     def unload_plugins(self):
@@ -41,6 +42,4 @@ class PluginManager:
     async def on_message(self, msg: Message):
         self.logger.info(f'接收到消息: <{msg.author.nickname}> {msg.content}')
         for plugin in self.plugins:
-            await plugin.on_message(msg)
-
-
+            await plugin.on_message(MessageInterface(self, plugin.meta.id, msg))

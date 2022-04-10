@@ -4,6 +4,8 @@ import pkgutil
 import sys
 from argparse import ArgumentParser
 
+import colorama
+
 from khldaemon.constants import core_constant
 from ruamel import yaml
 
@@ -45,16 +47,17 @@ def environment_check():
 def run_bot():
     print('{} {} is starting up'.format(core_constant.NAME, core_constant.VERSION))
     print('{} is open source, you can find it here: {}'.format(core_constant.NAME, core_constant.GITHUB_URL))
+    colorama.init(autoreset=True)
     if not environment_check():
         raise Exception('Use "python -m khldaemon init" to initialize KHLDaemon first')
 
     with open('config.yml', 'r', encoding='utf-8') as f:
         config = Config(**yaml.round_trip_load(f))
 
-    logger = ColoredLogger(level=config.log_level)
+    logger = ColoredLogger(name='khl.py', level=config.log_level)
     patch(logger)
 
-    plugin_manager = PluginManager(config, logger)
+    plugin_manager = PluginManager(config)
     plugin_manager.load_plugins()
 
     if not plugin_manager.bot.loop:
@@ -63,7 +66,7 @@ def run_bot():
         plugin_manager.bot.loop.run_until_complete(plugin_manager.bot.start())
     except KeyboardInterrupt:
         plugin_manager.unload_plugins()
-        logger.info('KHLDamon stopped')
+        plugin_manager.logger.info('KHLDamon stopped')
 
 
 def initialize_environment():
