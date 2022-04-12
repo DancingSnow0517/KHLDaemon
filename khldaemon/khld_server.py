@@ -1,11 +1,13 @@
 import asyncio
 
-from khl import Bot
+from khl import Bot, Message
 from ruamel import yaml
 
-from khldaemon.config import Config
-from khldaemon.plugin.plugin_manager import PluginManager
-from khldaemon.utils.logger import ColoredLogger
+from .command.command_source import UserCommandSource
+from .command.command_manager import CommandManager
+from .config import Config
+from .plugin.plugin_manager import PluginManager
+from .utils.logger import ColoredLogger
 
 
 def get_config():
@@ -19,9 +21,8 @@ class KHLDaemonServer:
         self.config = get_config()
         self.logger = ColoredLogger(level=self.config.log_level)
         self.bot = Bot(self.config.token)
-        self.plugin_manager = PluginManager(self.config, self.bot)
-
-        self.bot.task.add_interval(seconds=30, timezone='Asia/Shanghai')(lambda: print('task'))
+        self.plugin_manager = PluginManager(self)
+        self.command_manager = CommandManager(self)
 
     def start(self):
         self.plugin_manager.load_plugins()

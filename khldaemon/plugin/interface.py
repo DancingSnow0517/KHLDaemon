@@ -2,20 +2,24 @@ import json
 import os.path
 from typing import TYPE_CHECKING, Optional, Type, TypeVar, Union
 
-from khl import Message
+from khl import Message, Event
 
+from ..command.builder.nodes.basic import Literal
 from ..utils.logger import ColoredLogger
 from ..utils.serializer import Serializable
 
 if TYPE_CHECKING:
     from .plugin_manager import PluginManager
+    from ..khld_server import KHLDaemonServer
 
 SerializableType = TypeVar('SerializableType')
 
 
 class Interface:
-    def __init__(self, plg_manager: 'PluginManager', plugin_id: str) -> None:
-        self.plugin_manager = plg_manager
+    def __init__(self, khld_server: 'KHLDaemonServer', plugin_id: str) -> None:
+        self.khld_server = khld_server
+        self.plugin_manager = self.khld_server.plugin_manager
+        self.command_manger = self.khld_server.command_manager
         self.plugin_id = plugin_id
         self.config = self.plugin_manager.config
         self.bot = self.plugin_manager.bot
@@ -26,6 +30,9 @@ class PluginInterface(Interface):
 
     def registry_help_messages(self, prefix: str, desc: str):
         self.plugin_manager.help_messages[prefix] = desc
+
+    def register_command(self, literal: Literal):
+        self.command_manger.register_command(literal)
 
     def load_config_simple(
             self, file_name='config.json', default_config: Optional = None, *, in_data_folder: bool = True,
@@ -103,6 +110,13 @@ class PluginInterface(Interface):
 
 class MessageInterface(Interface):
 
-    def __init__(self, plg_manager: 'PluginManager', plugin_id: str, msg: Message) -> None:
-        super().__init__(plg_manager, plugin_id)
+    def __init__(self, khld_server: 'KHLDaemonServer', plugin_id: str, msg: Message) -> None:
+        super().__init__(khld_server, plugin_id)
         self.message = msg
+
+
+class EventInterface(Interface):
+
+    def __init__(self, khld_server: 'KHLDaemonServer', plugin_id: str, event: Event) -> None:
+        super().__init__(khld_server, plugin_id)
+        self.event = event

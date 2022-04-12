@@ -1,6 +1,7 @@
-from ...plugin.interface import PluginInterface, MessageInterface
+from ...plugin.interface import PluginInterface, MessageInterface, EventInterface
 
 __all__ = [
     'PluginInterface',
-    'MessageInterface'
+    'MessageInterface',
+    'EventInterface'
 ]
