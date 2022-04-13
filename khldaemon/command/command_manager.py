@@ -21,7 +21,6 @@ class CommandManager:
         self.khld_server = khld_server
         self.config = self.khld_server.config
         self.logger = self.khld_server.logger
-        self.bot = self.khld_server.bot
 
         self.root_nodes = collections.defaultdict(list)  # type: Dict[str, List[Literal]]
 

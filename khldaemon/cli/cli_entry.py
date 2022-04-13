@@ -53,7 +53,7 @@ def run_bot():
     logger = ColoredLogger(name='khl.py', level=khldaemon_server.config.log_level)
     patch(logger)
 
-    khldaemon_server.start()
+    khldaemon_server.start_server()
 
 
 def initialize_environment():

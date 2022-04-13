@@ -21,9 +21,8 @@ class PluginManager:
         self.help_messages = {}
         self.config = self.khld_server.config
         self.logger = self.khld_server.logger
-        self.bot = self.khld_server.bot
-        self.bot.client.register(MessageTypes.TEXT, self.on_message)
-        self.bot.client.register(MessageTypes.SYS, self.on_event)
+        self.khld_server.client.register(MessageTypes.TEXT, self.on_message)
+        self.khld_server.client.register(MessageTypes.SYS, self.on_event)
 
     def search_all_plugin(self):
         self.plugins.clear()

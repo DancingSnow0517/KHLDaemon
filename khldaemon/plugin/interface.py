@@ -9,7 +9,6 @@ from ..utils.logger import ColoredLogger
 from ..utils.serializer import Serializable
 
 if TYPE_CHECKING:
-    from .plugin_manager import PluginManager
     from ..khld_server import KHLDaemonServer
 
 SerializableType = TypeVar('SerializableType')
@@ -22,7 +21,6 @@ class Interface:
         self.command_manger = self.khld_server.command_manager
         self.plugin_id = plugin_id
         self.config = self.plugin_manager.config
-        self.bot = self.plugin_manager.bot
         self.logger = ColoredLogger(level=self.config.log_level, plugin_id=self.plugin_id)
 
 
