@@ -1,7 +1,12 @@
 import importlib
 
+from khldaemon.plugin.interface import PluginInterface
+from typing import TYPE_CHECKING
+
 from .meta import Meta
 
+if TYPE_CHECKING:
+    from ...khld_server import KHLDaemonServer
 
 async def _func(interface):
     ...
@@ -9,9 +14,10 @@ async def _func(interface):
 
 class Plugin:
 
-    def __init__(self, path: str) -> None:
+    def __init__(self, path: str, khld_server: 'KHLDaemonServer') -> None:
         self.module = importlib.import_module(path)
         self.meta = Meta(self.module)
+        self.plugin_interface = PluginInterface(khld_server, self.meta.id)
 
         try:
             self.on_load = self.module.on_load

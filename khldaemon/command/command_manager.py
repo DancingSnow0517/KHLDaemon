@@ -52,7 +52,7 @@ class CommandManager:
             except CommandError as error:
                 if not error.is_handled():
                     error.set_message(f'{type(error).__name__}: {error.get_error_data()}')
-                    source.reply(error)
+                    source.reply(error.__str__())
             except:
                 self.logger.exception(
                     'Error when executing command "{}" with command source "{}" on {}'.format(command, source, node, ))

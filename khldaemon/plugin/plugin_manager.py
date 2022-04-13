@@ -4,7 +4,7 @@ from typing import Dict, TYPE_CHECKING
 from colorama import Fore, Style
 from khl import Message, MessageTypes, Event
 
-from .interface import PluginInterface, MessageInterface, EventInterface
+from .interface import MessageInterface, EventInterface
 from .type.plugin import Plugin
 from ..command.command_source import UserCommandSource
 
@@ -27,13 +27,13 @@ class PluginManager:
 
     def search_all_plugin(self):
         self.plugins.clear()
-        plugin = Plugin('khldaemon.plugin.builtin.khl_plugin')
+        plugin = Plugin('khldaemon.plugin.builtin.khl_plugin', self.khld_server)
         self.plugins[plugin.id] = plugin
         for DIR in self.config.plugin_directories:
             file_list = os.listdir(DIR)
             for file in file_list:
                 if file.endswith('.py'):
-                    plugin = Plugin(f'{DIR}.{file.replace(".py", "")}')
+                    plugin = Plugin(f'{DIR}.{file.replace(".py", "")}', self.khld_server)
                     if plugin.id in self.plugins:
                         self.logger.error(f'插件 {plugin.name}@{plugin.id} V{plugin.version} 加载失败')
                         continue
@@ -45,12 +45,18 @@ class PluginManager:
             plugin = self.plugins[plugin_id]
             self.logger.info(
                 f'插件 {plugin.meta.name}{Fore.GREEN}@{Style.RESET_ALL}{plugin.meta.id} {Fore.GREEN}V{plugin.meta.version}{Style.RESET_ALL} 已加载')
-            plugin.on_load(PluginInterface(self.khld_server, plugin.id))
+            plugin.on_load(plugin.plugin_interface)
 
     def unload_plugins(self):
         for plugin_id in self.plugins:
             plugin = self.plugins[plugin_id]
-            plugin.on_unload(PluginInterface(self.khld_server, plugin.id))
+            plugin.on_unload(plugin.plugin_interface)
+
+    def reload_plugins(self):
+        self.unload_plugins()
+        self.help_messages.clear()
+        self.khld_server.command_manager.root_nodes.clear()
+        self.load_plugins()
 
     async def on_message(self, msg: Message):
         self.logger.info(f'接收到消息: <{msg.author.nickname}> {msg.content}')

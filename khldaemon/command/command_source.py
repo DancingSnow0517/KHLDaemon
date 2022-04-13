@@ -2,13 +2,12 @@ import asyncio
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Union, List
 
-from khl import Message, User, MessageTypes
+from khl import Message, User, MessageTypes, Context, Channel, PublicChannel
+
+from .sync_class import SyncUser, SyncContext
 
 if TYPE_CHECKING:
     from ..khld_server import KHLDaemonServer
-
-
-
 
 
 class CommandSource(ABC):
@@ -16,6 +15,10 @@ class CommandSource(ABC):
     @abstractmethod
     def get_server(self) -> 'KHLDaemonServer':
         ...
+
+    @abstractmethod
+    def reply(self, param):
+        pass
 
 
 class UserCommandSource(CommandSource):
@@ -36,9 +39,16 @@ class UserCommandSource(CommandSource):
         self._loop.run_until_complete(self.message.delete_reaction(emoji, user))
 
     def reply(self, content: Union[str, List] = '', use_quote: bool = True, *, type: MessageTypes = None,
-                    **kwargs):
+              **kwargs):
         self._loop.run_until_complete(self.message.reply(content=content, use_quote=use_quote, type=type, **kwargs))
 
     def delete(self):
         self._loop.run_until_complete(self.message.delete())
+
+    @property
+    def author(self):
+        return SyncUser(self.message.author)
+
+    def ctx(self):
+        return SyncContext(self.message.ctx)
 
