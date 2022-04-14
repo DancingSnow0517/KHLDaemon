@@ -3,3 +3,4 @@ ruamel.yaml~=0.17.16
 parse>=1.18.0
 colorlog>=6.6.0
 colorama>=0.4.4
+nest_asyncio >= 1.5.5
