@@ -19,12 +19,12 @@
 ## 样例插件
 
 ```python
-from khl import Message
-
 from khldaemon.api.all import *
 # or
 # from khldaemon.api.interface import *
 # from khldaemon.api.utils import *
+# from khldaemon.api.command import *
+# from khldaemon.api.types import  *
 
 # plugin meta
 PLUGIN_METADATA = {
@@ -50,17 +50,17 @@ config: Config
 def on_load(interface: PluginInterface):
     global config
     interface.logger.info('plugin loaded')
-    bot = interface.bot
 
-    @bot.command(name='test')
-    async def test(msg: Message):
-        await msg.reply('test')
-    
+    interface.register_help_messages('!!hello', 'Hello World!')
+
+    # register a command
+    interface.register_command(
+        Literal('!!hello').runs(lambda src: src.reply('world!'))
+    )
+
     # config interface
     config = interface.load_config_simple(file_name='test_config.json', target_class=Config, in_data_folder=True)
-
     config.config1 = 't'
-
     interface.save_config_simple(config=config, file_name='test_config.json', in_data_folder=True)
 
 
@@ -71,6 +71,11 @@ def on_unload(interface: PluginInterface):
 
 # run when a message is received
 async def on_message(interface: MessageInterface):
-    interface.logger(interface.message.content)
+    interface.logger.info(interface.message.content)
+
+
+# run when an event is received
+async def on_event(interface: EventInterface):
+    interface.logger.info(interface.event.event_type)
 
 ```
