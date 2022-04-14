@@ -26,7 +26,7 @@ class Interface:
 
 class PluginInterface(Interface):
 
-    def registry_help_messages(self, prefix: str, desc: str):
+    def register_help_messages(self, prefix: str, desc: str):
         self.plugin_manager.help_messages[prefix] = desc
 
     def register_command(self, literal: Literal):

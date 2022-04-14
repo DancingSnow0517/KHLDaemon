@@ -24,8 +24,8 @@ reload_help_messages = '''[!!KHLD reload plugin] 重载所有插件
 
 
 def on_load(interface: PluginInterface):
-    interface.registry_help_messages('!!help', '显示帮助信息')
-    interface.registry_help_messages('!!KHLD', '显示机器人信息')
+    interface.register_help_messages('!!help', '显示帮助信息')
+    interface.register_help_messages('!!KHLD', '显示机器人信息')
 
     interface.register_command(
         Literal('!!help').runs(print_help_messages)
