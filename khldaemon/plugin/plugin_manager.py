@@ -17,7 +17,7 @@ class PluginManager:
 
     def __init__(self, khld_server: 'KHLDaemonServer') -> None:
         self.khld_server = khld_server
-        self.plugins = {}
+        self.plugins = {}  # type: Dict[str, Plugin]
         self.help_messages = {}
         self.config = self.khld_server.config
         self.logger = self.khld_server.logger
@@ -50,6 +50,7 @@ class PluginManager:
         for plugin_id in self.plugins:
             plugin = self.plugins[plugin_id]
             plugin.on_unload(plugin.plugin_interface)
+            self.logger.info(f'插件 {plugin.meta.name}{Fore.GREEN}@{Style.RESET_ALL}{plugin.meta.id} {Fore.GREEN}V{plugin.meta.version}{Style.RESET_ALL} 已卸载')
 
     def reload_plugins(self):
         self.unload_plugins()
