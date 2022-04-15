@@ -1,5 +1,5 @@
-from ...command.command_source import command_sync
+from ...command.command_source import async_command
 
 __all__ = [
-    'command_sync'
+    'async_command'
 ]

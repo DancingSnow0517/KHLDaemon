@@ -9,7 +9,7 @@ if TYPE_CHECKING:
     from ..khld_server import KHLDaemonServer
 
 
-def command_sync(func):
+def async_command(func):
     def _sync(source: UserCommandSource, msg=None):
         spec_args = inspect.getfullargspec(func).args
         spec_args_len = len(spec_args)
