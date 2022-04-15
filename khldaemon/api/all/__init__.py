@@ -7,3 +7,5 @@ from ..utils import *
 from ..command import *
 # noinspection PyUnresolvedReferences
 from ..types import *
+# noinspection PyUnresolvedReferences
+from ..decorator import *

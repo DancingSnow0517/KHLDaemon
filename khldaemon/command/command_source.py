@@ -1,13 +1,24 @@
 import asyncio
+import inspect
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Union, List
 
-from khl import Message, User, MessageTypes, Context, Channel, PublicChannel
-
-from .sync_class import SyncUser, SyncContext
+from khl import Message, MessageTypes
 
 if TYPE_CHECKING:
     from ..khld_server import KHLDaemonServer
+
+
+def command_sync(func):
+    def _sync(source: UserCommandSource, msg=None):
+        spec_args = inspect.getfullargspec(func).args
+        spec_args_len = len(spec_args)
+        if spec_args_len == 1:
+            asyncio.get_event_loop().run_until_complete(func(source))
+        else:
+            asyncio.get_event_loop().run_until_complete(func(source, msg))
+
+    return _sync
 
 
 class CommandSource(ABC):
@@ -17,7 +28,8 @@ class CommandSource(ABC):
         ...
 
     @abstractmethod
-    def reply(self, param):
+    def reply(self, content: Union[str, List] = '', use_quote: bool = True, *, type: MessageTypes = None,
+              **kwargs):
         pass
 
 
@@ -32,23 +44,6 @@ class UserCommandSource(CommandSource):
     def get_server(self) -> 'KHLDaemonServer':
         return self.khld_server
 
-    def add_reaction(self, emoji: str):
-        self._loop.run_until_complete(self.message.add_reaction(emoji))
-
-    def delete_reaction(self, emoji: str, user: User):
-        self._loop.run_until_complete(self.message.delete_reaction(emoji, user))
-
     def reply(self, content: Union[str, List] = '', use_quote: bool = True, *, type: MessageTypes = None,
               **kwargs):
         self._loop.run_until_complete(self.message.reply(content=content, use_quote=use_quote, type=type, **kwargs))
-
-    def delete(self):
-        self._loop.run_until_complete(self.message.delete())
-
-    @property
-    def author(self):
-        return SyncUser(self.message.author)
-
-    def ctx(self):
-        return SyncContext(self.message.ctx)
-

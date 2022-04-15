@@ -38,7 +38,7 @@ def on_load(interface: PluginInterface):
                 runs(show_khld_status)
         ).
             then(
-            Literal('plugin').
+            Literal({'plugin', 'plg'}).
                 runs(lambda src: src.reply(f'插件相关命令: \n```\n{plugin_help_messages}\n```', type=MessageTypes.KMD)).
                 then(
                 Literal('list').runs(list_plugin)
@@ -50,17 +50,17 @@ def on_load(interface: PluginInterface):
                 )
             ).
                 then(
-                Literal('reloadall').runs(reload_plugin)
+                Literal({'reloadall', 'ra'}).runs(reload_plugin)
             )
         ).
             then(
-            Literal('reload').
+            Literal({'reload', 'r'}).
                 runs(lambda src: src.reply(f'重载相关命令: \n```\n{reload_help_messages}\n```', type=MessageTypes.KMD)).
                 then(
-                Literal('plugin').runs(reload_plugin)
+                Literal({'plugin', 'plg'}).runs(reload_plugin)
             ).
                 then(
-                Literal('config').runs(reload_config)
+                Literal({'config', 'cfg'}).runs(reload_config)
             ).
                 then(
                 Literal('all').runs(reload_all)
@@ -113,12 +113,14 @@ def info_plugin(source: UserCommandSource, msg):
         source.reply('\n'.join(msg))
 
 
-def reload_plugin(source: UserCommandSource):
+async def reload_plugin(source: UserCommandSource):
     source.khld_server.plugin_manager.reload_plugins()
+    await source.message.ctx.channel.send(f'重载成功, 当前已加载 {len(source.khld_server.plugin_manager.plugins)} 插件')
 
 
-def reload_config(source: UserCommandSource):
+async def reload_config(source: UserCommandSource):
     source.khld_server.config = source.khld_server.get_config()
+    await source.message.ctx.channel.send('配置文件重载成功')
 
 
 def reload_all(source: UserCommandSource):
