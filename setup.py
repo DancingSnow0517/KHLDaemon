@@ -22,7 +22,7 @@ AUTHOR = 'DancingSnow'
 
 CLASSIFIERS = [
     # https://pypi.org/classifiers/
-    'License :: OSI Approved :: Apache Software License',
+    'License :: OSI Approved :: GNU Lesser General Public License v3 (LGPLv3)',
     'Programming Language :: Python'
 ]
 
