@@ -1,3 +1,5 @@
+from khl.card import CardMessage, Card, Module, Element, Types
+
 from khldaemon.api.all import *
 from khldaemon.constants import core_constant
 
@@ -32,14 +34,14 @@ def on_load(interface: PluginInterface):
     )
     interface.register_command(
         Literal('!!KHLD').
-            runs(lambda src: src.reply(f'KHLD 控制指令\n```\n{khld_help_messages}\n```', type=MessageTypes.KMD)).
+            runs(lambda src: src.reply(CardMessage(Card(Module.Header('KHLD 控制指令'), Module.Section(Element.Text(f'```\n{khld_help_messages}\n```', type=Types.Text.KMD)), theme=Types.Theme.SUCCESS)))).
             then(
             Literal('status').
                 runs(show_khld_status)
         ).
             then(
             Literal({'plugin', 'plg'}).
-                runs(lambda src: src.reply(f'插件相关命令: \n```\n{plugin_help_messages}\n```', type=MessageTypes.KMD)).
+                runs(lambda src: src.reply(CardMessage(Card(Module.Header('插件相关命令'), Module.Section(Element.Text(f'```\n{plugin_help_messages}\n```', type=Types.Text.KMD)), theme=Types.Theme.SUCCESS)))).
                 then(
                 Literal('list').runs(list_plugin)
             ).
@@ -55,7 +57,7 @@ def on_load(interface: PluginInterface):
         ).
             then(
             Literal({'reload', 'r'}).
-                runs(lambda src: src.reply(f'重载相关命令: \n```\n{reload_help_messages}\n```', type=MessageTypes.KMD)).
+                runs(lambda src: src.reply(CardMessage(Card(Module.Header('重载相关命令'), Module.Section(Element.Text(f'```\n{reload_help_messages}\n```', type=Types.Text.KMD)), theme=Types.Theme.SUCCESS)))).
                 then(
                 Literal({'plugin', 'plg'}).runs(reload_plugin)
             ).
@@ -70,30 +72,33 @@ def on_load(interface: PluginInterface):
 
 
 def print_help_messages(source: UserCommandSource):
+    cm = CardMessage()
+
     help_messages = source.khld_server.plugin_manager.help_messages
     msg = []
     enter = '\n'
     for prefix in help_messages:
         msg.append(f'[{prefix}] {help_messages[prefix]}')
-    source.reply(f'KHLD 指令帮助信息列表\n```\n{enter.join(msg)}\n```', type=MessageTypes.KMD)
+    cm.append(Card(
+        Module.Header('KHLD 指令帮助信息列表'),
+        Module.Section(Element.Text(f'```\n{enter.join(msg)}\n```', type=Types.Text.KMD)), theme=Types.Theme.SUCCESS))
+    source.reply(cm)
 
 
 def show_khld_status(source: UserCommandSource):
-    msg = [
-        f'{core_constant.NAME_SHORT} 状态: ',
-        f'{core_constant.NAME} 版本 {core_constant.VERSION}',
-        f'{core_constant.NAME} 状态: {source.khld_server.status}',
-        f'插件数量: {source.khld_server.plugin_count}'
-    ]
-    source.reply('\n'.join(msg))
+    card = Card(Module.Header(f'{core_constant.NAME_SHORT} 状态'), theme=Types.Theme.WARNING)
+    card.append(Module.Section(Element.Text(f'{core_constant.NAME} 版本: {core_constant.VERSION}', type=Types.Text.KMD)))
+    card.append(Module.Section(Element.Text(f'{core_constant.NAME} 状态: {source.khld_server.status}', type=Types.Text.KMD)))
+    card.append(Module.Section(Element.Text(f'插件数量: {source.khld_server.plugin_count}', type=Types.Text.KMD)))
+    source.reply(CardMessage(card))
 
 
 def list_plugin(source: UserCommandSource):
-    msg = ['插件列表: ']
+    card = Card(Module.Header('插件列表'), Module.Divider(), theme=Types.Theme.INFO)
     plugins = source.khld_server.plugin_manager.plugins
     for plugin_id in plugins:
-        msg.append(f'{plugins[plugin_id].name}@{plugin_id}')
-    source.reply('\n'.join(msg))
+        card.append(Module.Section(Element.Text(f'{plugins[plugin_id].name}**@**{plugin_id}', type=Types.Text.KMD)))
+    source.reply(CardMessage(card))
 
 
 def info_plugin(source: UserCommandSource, msg):

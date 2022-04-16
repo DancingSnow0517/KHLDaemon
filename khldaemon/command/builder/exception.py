@@ -35,6 +35,9 @@ class CommandError(CommandErrorBase, ABC):
     def _error_command(self) -> str:
         return self._failed_command[len(self._parsed_command):]
 
+    def to_kmd(self) -> str:
+        return f'{self.__message}: {self._parsed_command}**{self._error_command}** <--'
+
     def get_error_data(self) -> tuple:
         """
         Data that might be helpful to the error display

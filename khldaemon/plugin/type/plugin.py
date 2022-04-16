@@ -8,6 +8,7 @@ from .meta import Meta
 if TYPE_CHECKING:
     from ...khld_server import KHLDaemonServer
 
+
 async def _func(interface):
     ...
 

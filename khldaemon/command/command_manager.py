@@ -2,6 +2,8 @@ import collections
 from enum import auto, Enum
 from typing import TYPE_CHECKING, List, Dict
 
+from khl import MessageTypes
+
 import khldaemon.command.builder.command_builder_util as utils
 from .builder.exception import CommandError
 from .builder.nodes.basic import Literal, CommandSuggestion, CommandSuggestions
@@ -40,8 +42,7 @@ class CommandManager:
         if purpose == TraversePurpose.SUGGEST and len(plugin_root_nodes) == 0:
             return CommandSuggestions([CommandSuggestion('', literal) for literal in self.root_nodes.keys()])
 
-        for plugin_root_node in plugin_root_nodes:
-            node = plugin_root_node
+        for node in plugin_root_nodes:
             try:
                 if purpose == TraversePurpose.EXECUTE:
                     node.execute(source, command)
@@ -51,10 +52,10 @@ class CommandManager:
             except CommandError as error:
                 if not error.is_handled():
                     error.set_message(f'{type(error).__name__}: {error.get_error_data()}')
-                    source.reply(error.__str__())
+                    source.reply(error.to_kmd(), type=MessageTypes.KMD)
             except:
                 self.logger.exception(
-                    'Error when executing command "{}" with command source "{}" on {}'.format(command, source, node, ))
+                    'Error when executing command "{}" with command source "{}" on {}'.format(command, source, node))
 
         if purpose == TraversePurpose.SUGGEST:
             return suggestions

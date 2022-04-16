@@ -1,4 +1,4 @@
-from typing import List, overload
+from typing import List
 
 
 class Meta:

@@ -44,6 +44,6 @@ class UserCommandSource(CommandSource):
     def get_server(self) -> 'KHLDaemonServer':
         return self.khld_server
 
-    def reply(self, content: Union[str, List] = '', use_quote: bool = True, *, type: MessageTypes = None,
-              **kwargs):
+    def reply(self, content: Union[str, List] = '', use_quote: bool = True, *, type: MessageTypes = None, **kwargs):
+        print(content)
         self._loop.run_until_complete(self.message.reply(content=content, use_quote=use_quote, type=type, **kwargs))

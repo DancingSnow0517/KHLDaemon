@@ -34,3 +34,11 @@ class KHLDaemonServer:
         except KeyboardInterrupt:
             self.plugin_manager.unload_plugins()
             self.logger.info('KHLDamon stopped')
+
+    @property
+    def plugin_count(self):
+        return len(self.plugin_manager.plugins)
+
+    @property
+    def command_count(self):
+        return len(self.command_manager.root_nodes)
